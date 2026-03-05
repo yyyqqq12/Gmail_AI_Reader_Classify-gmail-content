@@ -155,3 +155,8 @@ Returns emails belonging to the selected category.
 
 Internship Project – AI Email Categorization Dashboard
 
+
+## Author
+
+Internship Project – AI Email Categorization Dashboard
+
