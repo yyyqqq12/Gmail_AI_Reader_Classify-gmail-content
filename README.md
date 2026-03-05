@@ -158,5 +158,7 @@ Internship Project – AI Email Categorization Dashboard
 
 ## Author
 
+Pang Yon Qi
+
 Internship Project – AI Email Categorization Dashboard
 
