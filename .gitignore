@@ -3,6 +3,21 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Node
+node_modules/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+
+
+# Environment
+.env
+
+# OS
+.DS_Store
 # C extensions
 *.so
 
