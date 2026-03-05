@@ -1,72 +1,157 @@
 # Gmail_AI_Reader_Categorize-gmail-content
 
-# Getting Started with Create React App
+# Gmail AI Email Categorization Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project reads emails from Gmail using the Gmail API, classifies them using AI, stores them in a database, and displays them in a dashboard.
 
-## Available Scripts
+It was built using **FastAPI (backend)** and **React (frontend)**.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Load emails from Gmail
+- AI-based email classification
+- Store emails in SQLite database
+- Dashboard showing email categories
+- Click category to view emails
+- Prevent duplicate emails
+- Automatic category counting
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Tech Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Backend:
+- Python
+- FastAPI
+- SQLite
+- Gmail API
 
-### `npm run build`
+Frontend:
+- React
+- Axios
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Project Structure
+Gmail_reader_categories/
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+backend
+│
+├── main.py
+├── database.py
+├── extractor.py
+├── gmail_to_json_local.py
+├── credentials.json
+├── token.json
+├── requirements.txt
+├── .env
 
-### `npm run eject`
+frontend
+│
+├── src
+│ └── components
+|   ├──CategoryView.js
+|   ├──Dashboard.js
+|   ├──EmailList.js
+|   └──Loading.js
+│ ├── api.js
+│ └── App.js
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1. Create Virtual Environment
+python -m venv venv
 
-## Learn More
+Activate it:
+venv\Scripts\activate
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+### 2. Install Dependencies
+pip install -r requirements.txt
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+create a .env file to put your chatgpt_api token
+---
 
-### Analyzing the Bundle Size
+### 3. Setup Gmail API
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. Go to Google Cloud Console  
+2. Enable **Gmail API**  
+3. Download `credentials.json`  
+4. Place it in the backend folder
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 4. Run Backend
+uvicorn main:app --reload
 
-### Advanced Configuration
+Server will run at:
+http://localhost:8000
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 5. Run Frontend
 
-### `npm run build` fails to minify
+Go to frontend folder:
+cd..
+cd email-ai-ui
+npm install
+npm start
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+Frontend runs at:
+http://localhost:3000
+
+
+---
+
+## API Endpoints
+
+### Load Emails
+GET /api/load-emails
+
+
+Loads emails from Gmail and saves them to the database.
+
+---
+
+GET /api/categories
+
+
+Returns category counts for dashboard.
+
+---
+
+### Get Emails by Category
+GET /api/emails/{category}/{sub_category}
+
+
+Returns emails belonging to the selected category.
+
+---
+
+## Example Categories
+
+- sales_documents
+- purchase_documents
+- logistics_delivery
+- appointments_meetings
+- finance
+- hr_internal
+- customer_support
+- system_notifications
+- marketing
+- uncategorized
+
+---
+
+## Author
+
+Internship Project – AI Email Categorization Dashboard
+
