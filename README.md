@@ -39,6 +39,7 @@ Gmail_reader_categories/
 
 backend
 │
+
 ├── main.py
 ├── database.py
 ├── extractor.py
