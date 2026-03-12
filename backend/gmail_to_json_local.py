@@ -11,7 +11,7 @@ from googleapiclient.discovery import build
 
 from openpyxl import Workbook
 
-from extractor import classify_email, extract_quotation
+from extractor import classify_email, extract_quotation, extract_purchase_order
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
@@ -187,21 +187,38 @@ def main():
         print("Category:", category)
         print("Sub:", sub_category)
 
-        if category == "sales_documents" and sub_category == "sales_quotation":
+        if category == "sales_documents":
 
-            quotation_data = extract_quotation(raw_text)
+            if sub_category == "sales_quotation":
 
-            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                quotation_data = extract_quotation(raw_text)
 
-            filename = f"quotation_{ts}_{msg_id}"
+                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"quotation_{ts}_{msg_id}"
 
-            save_json_and_excel(quotation_data, filename)
+                save_json_and_excel(quotation_data, filename)
 
-        else:
+            elif sub_category == "sales_order":
 
-            print("Not quotation email")
+                order_data = extract_purchase_order(raw_text)
 
-    print("\nDone")
+                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"sales_order_{ts}_{msg_id}"
+
+                save_json_and_excel(order_data, filename)
+
+            elif sub_category == "sales_invoice":
+
+                invoice_data = extract_purchase_order(raw_text)
+
+                ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"invoice_{ts}_{msg_id}"
+
+                save_json_and_excel(invoice_data, filename)
+
+            else:
+
+                print("Sales document but not supported yet")
 
 
 if __name__ == "__main__":

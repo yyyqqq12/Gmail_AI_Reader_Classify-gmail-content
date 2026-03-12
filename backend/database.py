@@ -70,3 +70,14 @@ def get_all_emails():
         })
 
     return result
+
+
+def clear_emails():
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM emails")
+
+    conn.commit()
+    conn.close()

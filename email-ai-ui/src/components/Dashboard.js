@@ -32,6 +32,18 @@ function Dashboard({ onSelectCategory }) {
     setLoading(false);
   };
 
+
+  const reloadEmails = async () => {
+
+    setLoading(true)
+
+    await axios.get("http://localhost:8000/api/reload-emails")
+
+    await loadCategories()
+
+    setLoading(false)
+  }
+
   useEffect(() => {
     loadCategories();
   }, []);
@@ -46,19 +58,20 @@ function Dashboard({ onSelectCategory }) {
       <h1>Email Dashboard</h1>
 
       {/* Load Gmail Button */}
+      
+
       <button
         onClick={loadEmails}
-        style={{
-          padding: "10px 30px",
-          background: "#2563eb",
-          color: "white",
-          border: "none",
-          borderRadius: "6px",
-          marginBottom: "20px",
-          cursor: "pointer"
-        }}
+        style={btnBlue}
       >
-        Load Emails
+        Load New Emails
+      </button>
+
+      <button
+        onClick={reloadEmails}
+        style={btnRed}
+      >
+        Delete and Reload All Emails
       </button>
 
       <div
@@ -105,5 +118,24 @@ function Dashboard({ onSelectCategory }) {
     </div>
   );
 }
+const btnBlue = {
+  padding: "10px 30px",
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: "6px",
+  marginRight: "10px",
+  marginBottom: "20px",
+  cursor: "pointer"
+};
 
+const btnRed = {
+  padding: "10px 30px",
+  background: "#ef4444",
+  color: "white",
+  border: "none",
+  borderRadius: "6px",
+  marginBottom: "20px",
+  cursor: "pointer"
+};
 export default Dashboard;

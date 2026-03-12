@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from gmail_to_json_local import get_gmail_service, extract_text_from_message
-from extractor import classify_email
+from extractor import classify_email, extract_quotation
+
 
 from database import init_db, save_email, get_all_emails
 app = FastAPI()
@@ -131,10 +132,26 @@ def fetch_emails():
         if not raw_text:
             continue
 
-        classification = classify_email(subject, raw_text)
+       
 
-        category = classification.get("category")
-        sub_category = classification.get("sub_category")
+        subject_lower = subject.lower()
+
+        # ---- RULE: invoice direction ----
+        if "invoice" in subject_lower:
+
+            if "mycompany.com" not in sender.lower():
+                category = "purchase_documents"
+                sub_category = "supplier_invoice"
+
+            else:
+                category = "sales_documents"
+                sub_category = "sales_invoice"
+
+        else:
+            classification = classify_email(subject, raw_text, sender)
+
+            category = classification.get("category") or "uncategorized"
+            sub_category = classification.get("sub_category") or "unknown"
 
         # detect system notifications
         if sender.lower().startswith("no-reply") or "noreply" in sender.lower():
@@ -282,10 +299,24 @@ def load_emails():
 
             raw_text = extract_text_from_message(full)
 
-            classification = classify_email(subject, raw_text)
+            subject_lower = subject.lower()
 
-            category = classification.get("category") or "uncategorized"
-            sub_category = classification.get("sub_category") or "unknown"
+            # ---- RULE: invoice direction ----
+            if "invoice" in subject_lower:
+
+                if "mysoft.com" not in sender.lower():
+                    category = "purchase_documents"
+                    sub_category = "supplier_invoice"
+
+                else:
+                    category = "sales_documents"
+                    sub_category = "sales_invoice"
+
+            else:
+                classification = classify_email(subject, raw_text, sender)
+
+                category = classification.get("category") or "uncategorized"
+                sub_category = classification.get("sub_category") or "unknown"
 
             email = {
                 "id": msg_id,
@@ -336,3 +367,214 @@ def get_system_notifications():
             })
 
     return notifications
+
+
+@app.get("/api/email/detail/{email_id}")
+def get_email_detail(email_id: str):
+
+    service = get_gmail_service()
+
+    full = service.users().messages().get(
+        userId="me",
+        id=email_id,
+        format="full"
+    ).execute()
+
+    headers = full.get("payload", {}).get("headers", [])
+
+    subject = ""
+    sender = ""
+    date = ""
+
+    for h in headers:
+
+        if h["name"] == "Subject":
+            subject = h["value"]
+
+        if h["name"] == "From":
+            sender = h["value"]
+
+        if h["name"] == "Date":
+            date = h["value"]
+
+    body = extract_text_from_message(full)
+
+    return {
+        "id": email_id,
+        "subject": subject,
+        "sender": sender,
+        "date": date,
+        "body": body
+    }
+
+
+
+@app.get("/api/create-quotation/{email_id}")
+def create_quotation(email_id: str):
+
+    service = get_gmail_service()
+
+    full = service.users().messages().get(
+        userId="me",
+        id=email_id,
+        format="full"
+    ).execute()
+
+    raw_text = extract_text_from_message(full)
+
+    if not raw_text:
+        return {"error": "No email body found"}
+
+    extracted = extract_quotation(raw_text)
+
+    return {
+        "email_id": email_id,
+        "quotation": extracted
+    }
+
+
+from extractor import extract_purchase_order
+
+@app.get("/api/create-po/{email_id}")
+def create_po(email_id: str):
+
+    service = get_gmail_service()
+
+    full = service.users().messages().get(
+        userId="me",
+        id=email_id,
+        format="full"
+    ).execute()
+
+    raw_text = extract_text_from_message(full)
+
+    if not raw_text:
+        return {"error": "No email body"}
+
+    extracted = extract_purchase_order(raw_text)
+
+    return {
+        "email_id": email_id,
+        "po": extracted
+    }
+
+
+from extractor import extract_invoice
+
+@app.get("/api/create-invoice/{email_id}")
+def create_invoice(email_id: str):
+
+    service = get_gmail_service()
+
+    full = service.users().messages().get(
+        userId="me",
+        id=email_id,
+        format="full"
+    ).execute()
+
+    raw_text = extract_text_from_message(full)
+
+    if not raw_text:
+        return {"error": "No email body"}
+
+    extracted = extract_invoice(raw_text)
+
+    return {
+        "email_id": email_id,
+        "invoice": extracted
+    }
+
+
+from database import clear_emails
+
+@app.get("/api/reload-emails")
+def reload_emails():
+
+    # delete all emails first
+    clear_emails()
+
+    service = get_gmail_service()
+
+    page_token = None
+    new_count = 0
+
+    while True:
+
+        results = service.users().messages().list(
+            userId="me",
+            maxResults=100,
+            pageToken=page_token
+        ).execute()
+
+        msgs = results.get("messages", [])
+
+        for m in msgs:
+
+            msg_id = m["id"]
+
+            full = service.users().messages().get(
+                userId="me",
+                id=msg_id,
+                format="full"
+            ).execute()
+
+            headers = full.get("payload", {}).get("headers", [])
+
+            subject = ""
+            sender = ""
+            date = ""
+
+            for h in headers:
+
+                if h["name"] == "Subject":
+                    subject = h["value"]
+
+                if h["name"] == "From":
+                    sender = h["value"]
+
+                if h["name"] == "Date":
+                    date = h["value"]
+
+            raw_text = extract_text_from_message(full)
+
+            subject_lower = subject.lower()
+
+            if "invoice" in subject_lower:
+
+                if "mysoft.com" not in sender.lower():
+                    category = "purchase_documents"
+                    sub_category = "supplier_invoice"
+
+                else:
+                    category = "sales_documents"
+                    sub_category = "sales_invoice"
+
+            else:
+
+                classification = classify_email(subject, raw_text, sender)
+
+                category = classification.get("category") or "uncategorized"
+                sub_category = classification.get("sub_category") or "unknown"
+
+            email = {
+                "id": msg_id,
+                "category": category,
+                "sub_category": sub_category,
+                "subject": subject,
+                "sender": sender,
+                "date": date
+            }
+
+            save_email(email)
+
+            new_count += 1
+
+        page_token = results.get("nextPageToken")
+
+        if not page_token:
+            break
+
+    return {
+        "status": "reloaded",
+        "total_emails": new_count
+    }

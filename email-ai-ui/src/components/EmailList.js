@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getEmails } from "../api";
 import Loading from "./Loading";
 
-function EmailList({ category, sub, goBack }) {
+function EmailList({ category, sub, goBack, onOpenEmail }) {
 
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,8 +58,14 @@ function EmailList({ category, sub, goBack }) {
         background: "white",
         borderRadius: "10px",
         boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
-        overflow: "hidden"
+        
       }}>
+
+        <div style={{
+          maxHeight: "70vh",
+          overflowY: "auto"
+        }}>
+      
 
         <table
           style={{
@@ -67,6 +73,7 @@ function EmailList({ category, sub, goBack }) {
             borderCollapse: "collapse"
           }}
         >
+        
           <thead style={{ background: "#f1f5f9" }}>
             <tr>
               <th style={thStyle}>Subject</th>
@@ -91,10 +98,13 @@ function EmailList({ category, sub, goBack }) {
               emails.map((e, i) => (
                 <tr
                   key={i}
+                  onClick={() => onOpenEmail(e.id)}
                   style={{
                     borderTop: "1px solid #e2e8f0",
                     cursor: "pointer"
                   }}
+                  onMouseEnter={e => e.currentTarget.style.background="#f8fafc"}
+                  onMouseLeave={e => e.currentTarget.style.background="white"}
                 >
                   <td style={tdStyle}>{e.subject}</td>
                   <td style={tdStyle}>{e.sender}</td>
@@ -105,7 +115,7 @@ function EmailList({ category, sub, goBack }) {
 
           </tbody>
         </table>
-
+      </div>
       </div>
 
     </div>
@@ -116,7 +126,11 @@ function EmailList({ category, sub, goBack }) {
 const thStyle = {
   padding: "12px",
   textAlign: "left",
-  fontWeight: "600"
+  fontWeight: "600",
+  position: "sticky",
+  top: 0,
+  background: "#f1f5f9",
+  zIndex: 1
 };
 
 const tdStyle = {
