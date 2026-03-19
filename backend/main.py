@@ -8,6 +8,31 @@ from extractor import classify_email, extract_quotation
 from database import init_db, save_email, get_all_emails
 app = FastAPI()
 
+
+import sys
+import os
+
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# Determine correct base folder
+if getattr(sys, 'frozen', False):
+    BASE_DIR = sys._MEIPASS
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Example usage
+CREDENTIALS_PATH = os.path.join(BASE_DIR, "credentials.json")
+TOKEN_PATH = os.path.join(BASE_DIR, "token.json")
+ENV_PATH = os.path.join(BASE_DIR, ".env")
+DB_PATH = os.path.join(BASE_DIR, "emails.db")
+
+from dotenv import load_dotenv
+import os
+
+# Load .env file
+load_dotenv(ENV_PATH)
+
+
 init_db() 
 
 ALL_CATEGORIES = {
@@ -578,3 +603,9 @@ def reload_emails():
         "status": "reloaded",
         "total_emails": new_count
     }
+
+if __name__ == "__main__":
+    import uvicorn
+
+    print("Starting FastAPI server...")
+    uvicorn.run(app, host="0.0.0.0", port=8182)

@@ -1,10 +1,25 @@
 import json
 import os
+import sys
 from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
+# Handle PyInstaller paths
+if getattr(sys, 'frozen', False):
+    BASE_DIR = sys._MEIPASS
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+ENV_PATH = os.path.join(BASE_DIR, ".env")
+
+# Load environment variables from correct path
+load_dotenv(ENV_PATH)
+
+# Debug (optional)
+print("ENV PATH:", ENV_PATH)
+print("API KEY FOUND:", bool(os.getenv("OPENAI_API_KEY")))
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # ------------------------------------------------

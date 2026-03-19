@@ -25,7 +25,7 @@ function Dashboard({ onSelectCategory }) {
 
     setLoading(true);
 
-    await axios.get("http://localhost:8000/api/load-emails");
+    await axios.get("http://115.187.22.224:8182/api/load-emails");
 
     await loadCategories();   // refresh categories after loading emails
 
@@ -37,7 +37,7 @@ function Dashboard({ onSelectCategory }) {
 
     setLoading(true)
 
-    await axios.get("http://localhost:8000/api/reload-emails")
+    await axios.get("http://115.187.22.224:8182/api/reload-emails")
 
     await loadCategories()
 
