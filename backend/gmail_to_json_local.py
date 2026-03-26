@@ -12,6 +12,13 @@ from googleapiclient.discovery import build
 from openpyxl import Workbook
 
 from extractor import classify_email, extract_quotation, extract_purchase_order
+import sys
+
+if getattr(sys, 'frozen', False):
+    BASE_DIR = sys._MEIPASS
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
@@ -24,7 +31,7 @@ OUTPUT_DIR = "out_json"
 def get_gmail_service():
 
     creds = None
-    token_path = "token.json"
+    token_path = os.path.join(BASE_DIR, "token.json")
 
     if os.path.exists(token_path):
         creds = Credentials.from_authorized_user_file(token_path, SCOPES)
@@ -36,7 +43,7 @@ def get_gmail_service():
 
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json",
+                os.path.join(BASE_DIR, "credentials.json"),
                 SCOPES
             )
             creds = flow.run_local_server(port=0)
@@ -179,7 +186,7 @@ def main():
         print("\n----------------------------")
         print("Subject:", subject)
 
-        classification = classify_email(subject, raw_text)
+        classification = classify_email(subject, raw_text, sender)
 
         category = classification.get("category") or "others"
         sub_category = classification.get("sub_category") or "others"
