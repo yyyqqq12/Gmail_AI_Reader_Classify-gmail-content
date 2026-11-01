@@ -43,22 +43,36 @@ backend
 ├── main.py
 
 ├── database.py
+
 ├── extractor.py
+
 ├── gmail_to_json_local.py
+
 ├── credentials.json
+
 ├── token.json
+
 ├── requirements.txt
+
 ├── .env
+
 
 frontend
 │
 ├── src
+
 │ └── components
+
 |   ├──CategoryView.js
+
 |   ├──Dashboard.js
+
 |   ├──EmailList.js
+
 |   └──Loading.js
+
 │ ├── api.js
+
 │ └── App.js
 
 
