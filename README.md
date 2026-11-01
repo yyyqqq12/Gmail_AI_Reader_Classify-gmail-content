@@ -1,6 +1,6 @@
-# Gmail_AI_Reader_Categorize-gmail-content
+# Gmail_AI_Reader: Categorize-gmail-content
 
-# Gmail AI Email Categorization Dashboard
+
 
 This project reads emails from Gmail using the Gmail API, classifies them using AI, stores them in a database, and displays them in a dashboard.
 
