@@ -167,9 +167,7 @@ Returns emails belonging to the selected category.
 
 ---
 
-## Author
 
-Internship Project – AI Email Categorization Dashboard
 
 
 ## Author
